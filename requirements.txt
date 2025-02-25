@@ -1,0 +1,26 @@
+# List of dependencies for the Python script
+
+# For keylogging and clipboard access
+pynput==1.7.6
+pyperclip==1.8.2
+
+# For taking screenshots
+pyautogui==0.9.54
+
+# For encryption
+cryptography==41.0.3
+
+# For sending data to Telegram
+requests==2.31.0
+
+# For system information and platform detection
+platform==1.0.8
+
+# Windows-specific dependencies (only required on Windows)
+winshell==0.6
+
+# Standard library modules (no need to install separately)
+# threading
+# os
+# datetime
+# time
