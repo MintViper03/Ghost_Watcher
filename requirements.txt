@@ -18,6 +18,7 @@ platform==1.0.8
 
 # Windows-specific dependencies (only required on Windows)
 winshell==0.6
+pywin32
 
 # Standard library modules (no need to install separately)
 # threading
