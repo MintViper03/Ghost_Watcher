@@ -18,7 +18,7 @@ import pyautogui
 import platform
 from cryptography.fernet import Fernet
 
-# Hardcoded values (not recommended for production)
+# Change these values
 TOKEN = "7351189183:AAEvrxX6-o3nZsvvDTGr_NKTyN79nO9DqtA"  # Telegram API Token
 CHAT_ID = "5818909184"  # Telegram Chat ID
 
