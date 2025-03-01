@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 # Check if Python is installed
@@ -14,6 +15,9 @@ fi
 
 # Install Python dependencies
 pip3 install -r requirements.txt
+
+# Set the environment variable for PyAutoGUI to use scrot
+export PYAUTOGUI_SCREENSHOT=scrot
 
 # Run the Python script
 python3 ghost_watcher.py
