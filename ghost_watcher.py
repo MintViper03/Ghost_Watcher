@@ -142,6 +142,12 @@ class Uploader:
                 f.write(decrypted_data)
             print(f"File decrypted: {decrypted_file_path}")  # Debug: Print success message
 
+            # Read and print the decrypted file content
+            with open(decrypted_file_path, 'r') as f:
+                decrypted_content = f.read()
+            print("Decrypted file content:")
+            print(decrypted_content)
+
         except FileNotFoundError:
             print(f"Error: File not found. Check the path for the encrypted file.")
         except Exception as e:
