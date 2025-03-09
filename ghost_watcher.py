@@ -24,7 +24,7 @@ CHAT_ID = "5818909184"  # Telegram Chat ID
 
 # Constants
 INTERVAL = 60
-SCREENSHOT_INTERVAL = 90  # Interval for taking screenshots (in seconds)
+SCREENSHOT_INTERVAL = 40  # Interval for taking screenshots (in seconds)
 
 # Determine the temporary directory
 temp_dir = gettempdir()
