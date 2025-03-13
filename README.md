@@ -37,5 +37,5 @@ Before running the script, ensure you have the following:
 Clone this repository to your local machine:
 
 ```bash
-git clone https://github.com/your-username/keylogger.git
-cd keylogger
+git clone https://github.com/MintViper03/Ghost_Watcher.git
+cd Ghost_Watcher
