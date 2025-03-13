@@ -39,3 +39,10 @@ Clone this repository to your local machine:
 ```bash
 git clone https://github.com/MintViper03/Ghost_Watcher.git
 cd Ghost_Watcher
+
+### 2. Install Dependencies
+
+Install the required Python libraries:
+
+```bash
+pip install pynput pyperclip requests pyautogui cryptography pywin32
