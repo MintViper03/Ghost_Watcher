@@ -39,5 +39,6 @@ Clone this repository to your local machine:
 ```bash
 git clone https://github.com/MintViper03/Ghost_Watcher.git
 cd Ghost_Watcher
+```
 
 
