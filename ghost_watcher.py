@@ -19,8 +19,8 @@ from cryptography.fernet import Fernet
 from win32com.client import Dispatch
 
 # Change these values
-TOKEN = "7351189183:AAEvrxX6-o3nZsvvDTGr_NKTyN79nO9DqtA"  # Telegram API Token
-CHAT_ID = "5818909184"  # Telegram Chat ID
+TOKEN = "YOUR_TOKEN"  # Enter your Telegram API Token
+CHAT_ID = "CHAT_ID"  # Enter your Telegram Chat ID
 
 # Constants
 INTERVAL = 60
